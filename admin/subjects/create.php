@@ -1,3 +1,42 @@
+<?php
+    session_start();
+    include "../../config/database.php";
+    
+    //only admin can access this page
+    if (!isset($_SESSION["role"]) || $_SESSION["role"] != "admin"){
+        header("Location: ../../index.php");
+        exit;
+    }
+    $message = "";
+
+    if(isset($_POST["saveSubject"])){
+        //Get all Data From form.
+        $subject_code = $_POST["subject_code"];
+        $subject_name = $_POST["subject_name"];
+        $units = $_POST["units"];
+
+        //sql Command to insert record
+        $sql = "INSERT INTO subjects(
+                        `subject_code`,
+                        `subject_name`,
+                        `units`
+                        ) 
+                        VALUES (
+                        '$subject_code',
+                        '$subject_name',
+                        '$units'        
+                        )";
+
+        if(mysqli_query($conn, $sql)){
+            header("Location: index.php?message=Subjects Record Added Successfully");
+            exit;
+        }                
+        else{
+            $message = "Could not save Subjects record!";
+        }
+    }
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -33,7 +72,7 @@
 
                 <h2>Subject Form</h2>
 
-                <form>
+                <form method="POST">
 
                     <!-- Subject Code -->
                     <div class="mb-3">
@@ -41,7 +80,7 @@
                             Subject Code
                         </label>
 
-                        <input class="form-control">
+                        <input name="subject_code" class="form-control">
                     </div>
 
                     <!-- Subject Name -->
@@ -50,7 +89,7 @@
                             Subject Name
                         </label>
 
-                        <input class="form-control">
+                        <input name="subject_name" class="form-control">
                     </div>
 
                     <!-- Units -->
@@ -62,19 +101,21 @@
                         <input
                             type="number"
                             class="form-control"
+                            name="units"
                         >
                     </div>
 
                     <!-- Form Actions -->
                     <button
-                        type="button"
+                        type="submit"
                         class="btn btn-primary"
+                        name="saveSubject"
                     >
                         Save Subject
                     </button>
 
                     <a
-                        href="subjects.html"
+                        href="index.php"
                         class="btn btn-secondary"
                     >
                         Cancel
